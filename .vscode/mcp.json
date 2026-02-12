@@ -1,0 +1,9 @@
+{
+    "servers": {
+      "digital-twin-mcp": {
+        "command": "npx",
+        "args": ["ts-node", "src/mcp-server/index.ts"]
+      }
+    }
+  }
+  
