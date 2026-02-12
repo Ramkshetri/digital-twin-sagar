@@ -1,0 +1,23 @@
+{
+  "name": "digital-twin-sagar",
+  "version": "1.0.0",
+  "description": "Production-grade, cyber-hardened digital presence: - Professional portfolio - Ethical attack zones - Live threat telemetry dashboard - Alerting + AI-governed workflows",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.26.0"
+  },
+  "devDependencies": {
+    "@types/node": "^25.2.3",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  }
+}
