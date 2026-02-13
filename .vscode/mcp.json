@@ -2,7 +2,7 @@
     "servers": {
       "digital-twin-mcp": {
         "command": "npx",
-        "args": ["ts-node", "src/mcp-server/index.ts"]
+        "args": ["ts-node", "-P", "tsconfig.mcp.json", "src/mcp-server/index.ts"]
       }
     }
   }
