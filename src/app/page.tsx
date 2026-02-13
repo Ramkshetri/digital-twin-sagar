@@ -17,7 +17,7 @@ export default function Home() {
       <section>
         <h3>SYSTEM_METRICS</h3>
         <ul style={{ listStyle: 'none', padding: 0 }}>
-          <li>● STATUS: <span style={{ color: '#fff' }}>ONLIN</span></li>
+          <li>● STATUS: <span style={{ color: '#fff' }}>ONLINE</span></li>
           <li>● MCP_SERVER: <span style={{ color: '#fff' }}>ACTIVE</span></li>
           <li>● DEPLOYMENT: <span style={{ color: '#fff' }}>VERCEL_PRODUCTION</span></li>
         </ul>
