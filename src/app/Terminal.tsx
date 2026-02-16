@@ -1,4 +1,4 @@
-"use client"; // Critical for interactivity
+"use client";
 
 import React, { useState, useEffect, useRef } from 'react';
 
@@ -16,7 +16,6 @@ export default function Terminal() {
   ]);
   const bottomRef = useRef<HTMLDivElement>(null);
 
-  // Auto-scroll to bottom
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [logs]);
@@ -24,40 +23,28 @@ export default function Terminal() {
   const handleCommand = (cmd: string) => {
     const cleanCmd = cmd.trim().toLowerCase();
     const newLogs: LogEntry[] = [...logs, { type: 'user', content: cmd }];
-
-    // --- THE "BRAIN" OF THE CHATBOT ---
     let response = "";
     
     if (cleanCmd === 'help') {
-      response = `AVAILABLE COMMANDS:
-- about       : Display profile summary
-- status      : Check system integrity
-- interview   : Start role-specific simulation
-- contact     : Decrypt contact channels
-- clear       : Clear terminal screen`;
+      response = "AVAILABLE COMMANDS: about, status, interview, contact, clear";
     } else if (cleanCmd === 'status') {
-      response = `[SYSTEM SCAN COMPLETE]
-> Uptime: 99.99%
-> Security: AES-256 Encrypted
-> Location: Vercel Edge Network
-> MCP Server: Connected`;
+      response = "[SYSTEM SCAN] > Uptime: 99.9% > Security: Encrypted > MCP: Active";
     } else if (cleanCmd === 'about') {
-      response = "PROFILE: Sagar is a Cybersecurity Architect specializing in Next.js security hardening and automated threat detection.";
+      response = "PROFILE: Sagar is a Cybersecurity Architect specializing in Next.js security.";
     } else if (cleanCmd === 'interview') {
-      response = "INTERVIEW MODULE LOADED. Please specify target role: 'cybersecurity' or 'frontend'.";
+      response = "INTERVIEW MODULE: Specify role 'cybersecurity' or 'frontend'.";
     } else if (cleanCmd.includes('cyber')) {
-      response = "QUERY: How would you mitigate an SQL Injection attack? [Answering this demonstrates threat modeling skills]";
+      response = "QUERY: How would you mitigate an SQL Injection attack?";
     } else if (cleanCmd.includes('frontend')) {
-      response = "QUERY: Explain the React Virtual DOM reconciliation process.";
+      response = "QUERY: Explain React Virtual DOM.";
     } else if (cleanCmd === 'clear') {
       setLogs([]);
       setInput('');
       return;
     } else {
-      response = `Command '${cleanCmd}' not recognized. Type "help" for protocols.`;
+      response = `Command '${cleanCmd}' not recognized.`;
     }
 
-    // Add AI response with a slight "thinking" delay
     setTimeout(() => {
       setLogs(prev => [...prev, { type: 'ai', content: response }]);
     }, 400);
@@ -75,8 +62,7 @@ export default function Terminal() {
       fontFamily: 'Courier New, monospace',
       marginTop: '20px',
       height: '400px',
-      overflowY: 'auto',
-      boxShadow: '0 0 20px rgba(0, 255, 65, 0.1)'
+      overflowY: 'auto'
     }}>
       {logs.map((log, i) => (
         <div key={i} style={{ marginBottom: '10px', color: log.type === 'user' ? '#fff' : '#00ff41' }}>
@@ -84,8 +70,6 @@ export default function Terminal() {
           {log.content}
         </div>
       ))}
-      
-      {/* Input Area */}
       <div style={{ display: 'flex', alignItems: 'center', marginTop: '20px' }}>
         <span style={{ color: '#00ff41', marginRight: '10px' }}>{'>'}</span>
         <input 
@@ -94,15 +78,7 @@ export default function Terminal() {
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleCommand(input)}
           autoFocus
-          style={{ 
-            backgroundColor: 'transparent', 
-            border: 'none', 
-            color: '#fff', 
-            fontFamily: 'inherit',
-            fontSize: '1rem',
-            width: '100%',
-            outline: 'none'
-          }} 
+          style={{ backgroundColor: 'transparent', border: 'none', color: '#fff', width: '100%', outline: 'none' }} 
         />
       </div>
       <div ref={bottomRef} />

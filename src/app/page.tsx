@@ -1,4 +1,4 @@
-import Terminal from "./components/Terminal";
+import Terminal from "./Terminal";
 
 export default function Home() {
   return (
