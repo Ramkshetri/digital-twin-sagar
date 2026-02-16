@@ -21,38 +21,99 @@ export default function Terminal() {
   }, [logs]);
 
   const handleCommand = (cmd: string) => {
-    const cleanCmd = cmd.trim().toLowerCase();
+    const cleanCmd = cmd.trim();
+    const lowerCmd = cleanCmd.toLowerCase();
     const newLogs: LogEntry[] = [...logs, { type: 'user', content: cmd }];
+    
+    // --- FEATURE: SECRET ADMIN MODE ---
+    if (lowerCmd === 'sudo login admin') {
+      setTimeout(() => {
+        setLogs(prev => [...prev, { type: 'ai', content: 'ACCESS GRANTED. WELCOME, COMMANDER.' }]);
+        // You could even add state here to change the text color to red!
+      }, 500);
+      setLogs(newLogs);
+      setInput('');
+      return;
+    }
+
     let response = "";
     
-    if (cleanCmd === 'help') {
-      response = "AVAILABLE COMMANDS: about, status, interview, contact, clear";
-    } else if (cleanCmd === 'status') {
-      response = "[SYSTEM SCAN] > Uptime: 99.9% > Security: Encrypted > MCP: Active";
-    } else if (cleanCmd === 'about') {
-      response = "PROFILE: Sagar is a Cybersecurity Architect specializing in Next.js security.";
-    } else if (cleanCmd === 'interview') {
+    // --- FEATURE: ENCRYPTION TOOL ---
+    if (lowerCmd.startsWith('encrypt ')) {
+      const textToEncrypt = cleanCmd.replace('encrypt ', '');
+      const encrypted = btoa(textToEncrypt); // Native Base64 encoding
+      response = `[ENCRYPTED OUTPUT]: ${encrypted}`;
+    }
+    // --- FEATURE: DECRYPTION TOOL ---
+    else if (lowerCmd.startsWith('decrypt ')) {
+      try {
+        const textToDecrypt = cleanCmd.replace('decrypt ', '');
+        const decrypted = atob(textToDecrypt);
+        response = `[DECRYPTED DATA]: ${decrypted}`;
+      } catch (e) {
+        response = "[ERROR]: Invalid encryption string.";
+      }
+    }
+    // --- FEATURE: TRACE SIMULATION ---
+    else if (lowerCmd === 'trace') {
+      setLogs(newLogs);
+      setInput('');
+      
+      // Simulate a multi-step trace
+      const hops = [
+        "HOP 1: 192.168.1.1 (Localhost) - <1ms",
+        "HOP 2: 10.0.0.5 (Vercel Edge) - 12ms",
+        "HOP 3: 172.217.16.14 (Google DNS) - 24ms",
+        "HOP 4: 142.250.183.14 (AWS US-EAST) - 45ms",
+        "TARGET REACHED: SECURE_VAULT [ENCRYPTED]"
+      ];
+
+      // Print lines one by one for effect
+      hops.forEach((hop, index) => {
+        setTimeout(() => {
+          setLogs(prev => [...prev, { type: 'ai', content: hop }]);
+        }, index * 600); // 600ms delay between each line
+      });
+      return; // Return early so we don't trigger the default response
+    }
+    // --- EXISTING COMMANDS ---
+    else if (lowerCmd === 'help') {
+      response = "COMMANDS: status, about, interview, trace, encrypt [msg], decrypt [msg], clear";
+    } 
+    else if (lowerCmd === 'status') {
+      response = "[SYSTEM SCAN] > Uptime: 99.9% > Security: AES-256 > MCP: Active";
+    } 
+    else if (lowerCmd === 'about') {
+      response = "PROFILE: Sagar // Cybersecurity Architect // Specializing in Threat Detection.";
+    } 
+    else if (lowerCmd === 'interview') {
       response = "INTERVIEW MODULE: Specify role 'cybersecurity' or 'frontend'.";
-    } else if (cleanCmd.includes('cyber')) {
+    } 
+    else if (lowerCmd.includes('cyber')) {
       response = "QUERY: How would you mitigate an SQL Injection attack?";
-    } else if (cleanCmd.includes('frontend')) {
+    } 
+    else if (lowerCmd.includes('frontend')) {
       response = "QUERY: Explain React Virtual DOM.";
-    } else if (cleanCmd === 'clear') {
+    } 
+    else if (lowerCmd === 'clear') {
       setLogs([]);
       setInput('');
       return;
-    } else {
-      response = `Command '${cleanCmd}' not recognized.`;
+    } 
+    else {
+      response = `Command '${cleanCmd}' not recognized. Type "help" for protocols.`;
     }
 
-    setTimeout(() => {
-      setLogs(prev => [...prev, { type: 'ai', content: response }]);
-    }, 400);
+    // Default response delay
+    if (response) {
+      setTimeout(() => {
+        setLogs(prev => [...prev, { type: 'ai', content: response }]);
+      }, 400);
+    }
 
     setLogs(newLogs);
     setInput('');
   };
-
   return (
     <div style={{ 
       backgroundColor: '#000', 
