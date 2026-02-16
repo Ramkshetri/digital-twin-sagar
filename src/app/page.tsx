@@ -1,4 +1,4 @@
-import React from 'react';
+import Terminal from "./components/Terminal";
 
 export default function Home() {
   return (
@@ -14,13 +14,24 @@ export default function Home() {
         <p style={{ color: '#888' }}>[Role: Cybersecurity Architect | Status: Protected]</p>
       </header>
 
-      <section>
+      <section style={{ marginBottom: '40px' }}>
         <h3>SYSTEM_METRICS</h3>
         <ul style={{ listStyle: 'none', padding: 0 }}>
           <li>● STATUS: <span style={{ color: '#fff' }}>ONLINE</span></li>
-          <li>● MCP_SERVER: <span style={{ color: '#fff' }}>ACTIVE</span></li>
           <li>● DEPLOYMENT: <span style={{ color: '#fff' }}>VERCEL_PRODUCTION</span></li>
+          <li>● INTERFACE: <span style={{ color: '#fff' }}>INTERACTIVE_CLI_V2.0</span></li>
         </ul>
+      </section>
+
+      <section>
+        <h3>SECURE_COMMUNICATION_CHANNEL</h3>
+        <p style={{ fontSize: '0.9rem', color: '#888', marginBottom: '10px' }}>
+          // Initiate interaction with the Digital Twin AI below.
+        </p>
+        
+        {/* This is your new AI Chatbot */}
+        <Terminal />
+        
       </section>
 
       <footer style={{ marginTop: '50px', fontSize: '0.8rem', color: '#444' }}>
