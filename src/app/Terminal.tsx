@@ -3,17 +3,41 @@
 import React, { useState, useEffect, useRef } from 'react';
 
 type LogEntry = {
-  type: 'system' | 'user' | 'ai';
+  type: 'system' | 'user' | 'ai' | 'error' | 'success';
   content: string;
+};
+
+// --- MOCK FILE SYSTEM ---
+const fileSystem: Record<string, string[]> = {
+  "~": ["projects", "skills", "contact", "secrets"],
+  "~/projects": ["digital-twin.txt", "mcp-server.md", "portfolio-v1.log"],
+  "~/skills": ["cybersecurity.md", "react.ts", "linux-admin.sh"],
+  "~/contact": ["email.txt", "github.url"],
+  "~/secrets": ["encrypted-flag.bin"]
+};
+
+const fileContents: Record<string, string> = {
+  "digital-twin.txt": "STATUS: Production Ready. Stack: Next.js 14, Vercel, MCP.",
+  "mcp-server.md": "Architecture: Decoupled logic using Model Context Protocol.",
+  "cybersecurity.md": "Skills: Penetration Testing, WAF Configuration, Threat Analysis.",
+  "react.ts": "Proficiency: Hooks, Context API, Server Components.",
+  "email.txt": "contact@sagar.dev (Simulated)",
+  "github.url": "github.com/Ramkshetri/digital-twin-sagar",
+  "encrypted-flag.bin": "FATAL: ROOT ACCESS REQUIRED TO DECRYPT."
 };
 
 export default function Terminal() {
   const [input, setInput] = useState('');
+  const [currentPath, setCurrentPath] = useState("~");
+  const [isRoot, setIsRoot] = useState(false);
+  
   const [logs, setLogs] = useState<LogEntry[]>([
-    { type: 'system', content: 'INITIALIZING DIGITAL TWIN PROTOCOL...' },
-    { type: 'system', content: 'CONNECTION ESTABLISHED.' },
-    { type: 'ai', content: 'Greetings. I am the Digital Twin of Sagar. Type "help" to see available commands.' },
+    { type: 'system', content: 'INITIALIZING DIGITAL TWIN KERNEL...' },
+    { type: 'system', content: 'MOUNTING VIRTUAL FILE SYSTEM... [OK]' },
+    { type: 'system', content: 'LOADING SECURITY PROTOCOLS... [OK]' },
+    { type: 'ai', content: 'Welcome to SagarOS v2.0. Type "help" to view commands.' },
   ]);
+  
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -21,125 +45,202 @@ export default function Terminal() {
   }, [logs]);
 
   const handleCommand = (cmd: string) => {
-    const cleanCmd = cmd.trim();
-    const lowerCmd = cleanCmd.toLowerCase();
-    const newLogs: LogEntry[] = [...logs, { type: 'user', content: cmd }];
-    
-    // --- FEATURE: SECRET ADMIN MODE ---
-    if (lowerCmd === 'sudo login admin') {
-      setTimeout(() => {
-        setLogs(prev => [...prev, { type: 'ai', content: 'ACCESS GRANTED. WELCOME, COMMANDER.' }]);
-        // You could even add state here to change the text color to red!
-      }, 500);
-      setLogs(newLogs);
-      setInput('');
-      return;
-    }
+    const rawCmd = cmd.trim();
+    const args = rawCmd.split(' ');
+    const command = args[0].toLowerCase();
+    const target = args[1];
+
+    // Log the user's command
+    const newLogs: LogEntry[] = [...logs, { 
+      type: 'user', 
+      content: `${isRoot ? 'root' : 'visitor'}@sagar:${currentPath} $ ${rawCmd}` 
+    }];
 
     let response = "";
-    
-    // --- FEATURE: ENCRYPTION TOOL ---
-    if (lowerCmd.startsWith('encrypt ')) {
-      const textToEncrypt = cleanCmd.replace('encrypt ', '');
-      const encrypted = btoa(textToEncrypt); // Native Base64 encoding
-      response = `[ENCRYPTED OUTPUT]: ${encrypted}`;
+    let type: LogEntry['type'] = 'ai';
+
+    // --- COMMAND: HELP ---
+    if (command === 'help') {
+      response = `AVAILABLE BINARIES:
+  ls            List directory contents
+  cd [dir]      Change directory
+  cat [file]    Read file content
+  status        Check system integrity
+  trace         Run network trace simulation
+  encrypt [txt] Encrypt string (Base64)
+  decrypt [txt] Decrypt string
+  sudo su       Elevate privileges
+  clear         Clear terminal`;
     }
-    // --- FEATURE: DECRYPTION TOOL ---
-    else if (lowerCmd.startsWith('decrypt ')) {
-      try {
-        const textToDecrypt = cleanCmd.replace('decrypt ', '');
-        const decrypted = atob(textToDecrypt);
-        response = `[DECRYPTED DATA]: ${decrypted}`;
-      } catch (e) {
-        response = "[ERROR]: Invalid encryption string.";
+    
+    // --- COMMAND: LS ---
+    else if (command === 'ls') {
+      const files = fileSystem[currentPath];
+      response = files ? files.join("    ") : "";
+    }
+
+    // --- COMMAND: CD ---
+    else if (command === 'cd') {
+      if (!target || target === "~") {
+        setCurrentPath("~");
+      } else if (target === "..") {
+        // Simple logic to go back to root for this demo
+        setCurrentPath("~");
+      } else {
+        const potentialPath = currentPath === "~" ? `~/${target}` : `${currentPath}/${target}`;
+        if (fileSystem[potentialPath]) {
+          setCurrentPath(potentialPath);
+        } else {
+          response = `cd: ${target}: No such file or directory`;
+          type = 'error';
+        }
       }
     }
-    // --- FEATURE: TRACE SIMULATION ---
-    else if (lowerCmd === 'trace') {
+
+    // --- COMMAND: CAT ---
+    else if (command === 'cat') {
+      if (!target) {
+        response = "usage: cat [filename]";
+      } else if (target === "encrypted-flag.bin" && !isRoot) {
+        response = "PERMISSION DENIED: Root access required.";
+        type = 'error';
+      } else if (fileContents[target]) {
+        response = fileContents[target];
+      } else {
+        response = `cat: ${target}: No such file or directory`;
+        type = 'error';
+      }
+    }
+
+    // --- COMMAND: TRACE (ANIMATED) ---
+    else if (command === 'trace') {
       setLogs(newLogs);
       setInput('');
-      
-      // Simulate a multi-step trace
       const hops = [
-        "HOP 1: 192.168.1.1 (Localhost) - <1ms",
-        "HOP 2: 10.0.0.5 (Vercel Edge) - 12ms",
-        "HOP 3: 172.217.16.14 (Google DNS) - 24ms",
-        "HOP 4: 142.250.183.14 (AWS US-EAST) - 45ms",
-        "TARGET REACHED: SECURE_VAULT [ENCRYPTED]"
+        "TRACEROUTE to target-vault (192.168.X.X), 30 hops max",
+        "1  10.0.0.1 (gateway)       0.452 ms",
+        "2  172.16.254.1 (isp-node)  12.4 ms",
+        "3  45.33.12.9 (backbone)    24.1 ms",
+        "4  104.22.4.1 (vercel-edge) 11.2 ms",
+        "5  TARGET [SECURED] REACHED."
       ];
-
-      // Print lines one by one for effect
-      hops.forEach((hop, index) => {
+      hops.forEach((hop, i) => {
         setTimeout(() => {
           setLogs(prev => [...prev, { type: 'ai', content: hop }]);
-        }, index * 600); // 600ms delay between each line
+        }, i * 500);
       });
-      return; // Return early so we don't trigger the default response
+      return; 
     }
-    // --- EXISTING COMMANDS ---
-    else if (lowerCmd === 'help') {
-      response = "COMMANDS: status, about, interview, trace, encrypt [msg], decrypt [msg], clear";
-    } 
-    else if (lowerCmd === 'status') {
-      response = "[SYSTEM SCAN] > Uptime: 99.9% > Security: AES-256 > MCP: Active";
-    } 
-    else if (lowerCmd === 'about') {
-      response = "PROFILE: Sagar // Cybersecurity Architect // Specializing in Threat Detection.";
-    } 
-    else if (lowerCmd === 'interview') {
-      response = "INTERVIEW MODULE: Specify role 'cybersecurity' or 'frontend'.";
-    } 
-    else if (lowerCmd.includes('cyber')) {
-      response = "QUERY: How would you mitigate an SQL Injection attack?";
-    } 
-    else if (lowerCmd.includes('frontend')) {
-      response = "QUERY: Explain React Virtual DOM.";
-    } 
-    else if (lowerCmd === 'clear') {
+
+    // --- COMMAND: ENCRYPT ---
+    else if (command === 'encrypt') {
+      const text = rawCmd.replace('encrypt ', '');
+      if (text === 'encrypt') {
+        response = "usage: encrypt [text]";
+      } else {
+        response = `[OUTPUT]: ${btoa(text)}`;
+        type = 'success';
+      }
+    }
+
+    // --- COMMAND: DECRYPT ---
+    else if (command === 'decrypt') {
+      const text = rawCmd.replace('decrypt ', '');
+      try {
+        response = `[OUTPUT]: ${atob(text)}`;
+        type = 'success';
+      } catch {
+        response = "ERROR: Invalid Base64 string.";
+        type = 'error';
+      }
+    }
+
+    // --- COMMAND: SUDO ---
+    else if (command === 'sudo' && target === 'su') {
+      setIsRoot(true);
+      response = "ROOT ACCESS GRANTED. USE WITH CAUTION.";
+      type = 'success';
+    }
+
+    // --- COMMAND: STATUS ---
+    else if (command === 'status') {
+      response = `[SYSTEM METRICS]
+> Uptime: 99.999%
+> CPU: Neural Engine Active
+> Security: ${isRoot ? 'ROOT ACCESS DETECTED' : 'Standard User'}
+> Connection: Encrypted (TLS 1.3)`;
+    }
+
+    // --- COMMAND: CLEAR ---
+    else if (command === 'clear') {
       setLogs([]);
       setInput('');
       return;
-    } 
-    else {
-      response = `Command '${cleanCmd}' not recognized. Type "help" for protocols.`;
     }
 
-    // Default response delay
+    // --- UNKNOWN ---
+    else if (rawCmd !== "") {
+      response = `Command '${command}' not found. Type 'help' for list.`;
+      type = 'error';
+    }
+
+    // Update Logs
     if (response) {
       setTimeout(() => {
-        setLogs(prev => [...prev, { type: 'ai', content: response }]);
-      }, 400);
+        setLogs(prev => [...prev, { type, content: response }]);
+      }, 100);
     }
-
+    
     setLogs(newLogs);
     setInput('');
   };
+
   return (
     <div style={{ 
-      backgroundColor: '#000', 
+      backgroundColor: '#0a0a0a', 
       border: '1px solid #333', 
-      borderRadius: '5px',
+      borderRadius: '8px',
       padding: '20px', 
       fontFamily: 'Courier New, monospace',
-      marginTop: '20px',
-      height: '400px',
-      overflowY: 'auto'
+      marginTop: '30px',
+      height: '500px',
+      overflowY: 'auto',
+      boxShadow: '0 0 30px rgba(0, 255, 65, 0.05)'
     }}>
       {logs.map((log, i) => (
-        <div key={i} style={{ marginBottom: '10px', color: log.type === 'user' ? '#fff' : '#00ff41' }}>
-          <span style={{ opacity: 0.7 }}>{log.type === 'user' ? '> USER: ' : '> SAGAR_AI: '}</span>
+        <div key={i} style={{ 
+          marginBottom: '8px', 
+          lineHeight: '1.4',
+          color: log.type === 'user' ? '#fff' : 
+                 log.type === 'error' ? '#ff3333' : 
+                 log.type === 'success' ? '#00ff41' : '#00ff41' 
+        }}>
+          {log.type === 'user' ? '' : <span style={{ marginRight: '10px' }}>{'>'}</span>}
           {log.content}
         </div>
       ))}
+      
+      {/* Input Area */}
       <div style={{ display: 'flex', alignItems: 'center', marginTop: '20px' }}>
-        <span style={{ color: '#00ff41', marginRight: '10px' }}>{'>'}</span>
+        <span style={{ color: isRoot ? '#ff3333' : '#00ff41', marginRight: '10px' }}>
+          {isRoot ? 'root' : 'visitor'}@sagar:{currentPath} $
+        </span>
         <input 
           type="text" 
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleCommand(input)}
           autoFocus
-          style={{ backgroundColor: 'transparent', border: 'none', color: '#fff', width: '100%', outline: 'none' }} 
+          spellCheck={false}
+          style={{ 
+            backgroundColor: 'transparent', 
+            border: 'none', 
+            color: '#fff', 
+            fontFamily: 'inherit',
+            fontSize: '1rem',
+            width: '100%',
+            outline: 'none'
+          }} 
         />
       </div>
       <div ref={bottomRef} />
