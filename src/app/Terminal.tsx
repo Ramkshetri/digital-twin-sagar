@@ -26,7 +26,7 @@ const fileContents: Record<string, string> = {
   "encrypted-flag.bin": "FATAL: ROOT ACCESS REQUIRED TO DECRYPT."
 };
 
-export default function Terminal(){
+export default function Terminal() {
   const [input, setInput] = useState('');
   const [currentPath, setCurrentPath] = useState("~");
   const [isRoot, setIsRoot] = useState(false);
@@ -84,7 +84,6 @@ export default function Terminal(){
       if (!target || target === "~") {
         setCurrentPath("~");
       } else if (target === "..") {
-        // Simple logic to go back to root for this demo
         setCurrentPath("~");
       } else {
         const potentialPath = currentPath === "~" ? `~/${target}` : `${currentPath}/${target}`;
@@ -95,7 +94,7 @@ export default function Terminal(){
           type = 'error';
         }
       }
-      }
+    }
 
     // --- COMMAND: CAT ---
     else if (command === 'cat') {
@@ -211,8 +210,8 @@ export default function Terminal(){
         <div key={i} style={{ 
           marginBottom: '8px', 
           lineHeight: '1.4',
-          whiteSpace: 'pre-wrap',  // <--- THIS IS THE MAGIC FIX
-          wordBreak: 'break-word', // Prevents long text from breaking layout
+          whiteSpace: 'pre-wrap', 
+          wordBreak: 'break-word', 
           color: log.type === 'user' ? '#fff' : 
                  log.type === 'error' ? '#ff3333' : 
                  log.type === 'success' ? '#00ff41' : '#00ff41' 
@@ -248,3 +247,4 @@ export default function Terminal(){
       <div ref={bottomRef} />
     </div>
   );
+}
