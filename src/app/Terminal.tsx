@@ -32,7 +32,7 @@ export default function Terminal() {
   
   const [logs, setLogs] = useState<LogEntry[]>([
     { type: 'system', content: 'INITIALIZING SECURITY PROTOCOLS...' },
-    { type: 'system', content: 'LOADING MODULES: [ENCRYPT, DECRYPT, TRACE]... OK' },
+    { type: 'system', content: 'CONNECTING TO VERCEL EDGE NETWORK... [OK]' },
     { type: 'ai', content: 'SagarOS v2.0 Online. Type "help" for commands.' },
   ]);
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -45,8 +45,8 @@ export default function Terminal() {
     const rawCmd = cmd.trim();
     const args = rawCmd.split(' ');
     const command = args[0].toLowerCase();
-    const target = args[1]; // The second word (e.g., filename or folder)
-    const extra = rawCmd.substring(command.length + 1).trim(); // Everything else
+    const target = args[1]; 
+    const extra = rawCmd.substring(command.length + 1).trim(); 
 
     const newLogs: LogEntry[] = [...logs, { 
       type: 'user', 
@@ -63,6 +63,7 @@ export default function Terminal() {
   cd [dir]      Change directory
   cat [file]    Read file content
   status        Check system integrity
+  threat-intel  View active blocked attacks (SOC Mode)
   trace         Run network trace simulation
   encrypt [txt] Encrypt string (Base64)
   decrypt [txt] Decrypt string
@@ -70,6 +71,33 @@ export default function Terminal() {
   clear         Clear terminal`;
     }
     
+    // --- COMMAND: THREAT-INTEL (SOC DASHBOARD) ---
+    else if (command === 'threat-intel') {
+      setLogs(newLogs);
+      setInput('');
+      
+      const threats = [
+        "ESTABLISHING SECURE CONNECTION TO FIREWALL LOGS...",
+        "ANALYZING REAL-TIME TRAFFIC...",
+        "---------------------------------------------------",
+        "[BLOCKED] IP: 45.22.19.112 | TIME: 10:42:05 | RULE: SQL_INJECTION_FILTER",
+        "[BLOCKED] IP: 88.12.99.23  | TIME: 10:45:11 | RULE: BAD_BOT (sqlmap)",
+        "[BLOCKED] IP: 102.33.1.55  | TIME: 10:50:44 | RULE: GEO_BLOCK (Unknown Region)",
+        "[WARNING] PORT SCAN DETECTED FROM 192.168.0.5",
+        "---------------------------------------------------",
+        "STATUS: PERIMETER SECURE. 4 CRITICAL THREATS MITIGATED."
+      ];
+
+      threats.forEach((line, i) => {
+        setTimeout(() => {
+          // Use 'error' type (Red) for blocked items to look like alerts
+          const msgType = line.includes('[BLOCKED]') ? 'error' : 'ai';
+          setLogs(prev => [...prev, { type: msgType, content: line }]);
+        }, i * 400);
+      });
+      return;
+    }
+
     // --- COMMAND: LS ---
     else if (command === 'ls') {
       const files = fileSystem[currentPath];
@@ -112,7 +140,7 @@ export default function Terminal() {
     else if (command === 'status') {
       response = `[SYSTEM METRICS]
 > Uptime: 99.999%
-> Firewall: ACTIVE (WAF)
+> Firewall: ACTIVE (Middleware WAF)
 > Security: ${isRoot ? 'ROOT ACCESS DETECTED' : 'Standard User'}
 > Connection: Encrypted (TLS 1.3)`;
     }
