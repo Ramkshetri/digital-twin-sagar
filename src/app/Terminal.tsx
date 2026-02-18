@@ -26,7 +26,7 @@ const fileContents: Record<string, string> = {
   "encrypted-flag.bin": "FATAL: ROOT ACCESS REQUIRED TO DECRYPT."
 };
 
-export default function Terminal() 
+export default function Terminal(){
   const [input, setInput] = useState('');
   const [currentPath, setCurrentPath] = useState("~");
   const [isRoot, setIsRoot] = useState(false);
@@ -95,7 +95,7 @@ export default function Terminal()
           type = 'error';
         }
       }
-    }
+      }
 
     // --- COMMAND: CAT ---
     else if (command === 'cat') {
