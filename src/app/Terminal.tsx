@@ -211,6 +211,8 @@ export default function Terminal() {
         <div key={i} style={{ 
           marginBottom: '8px', 
           lineHeight: '1.4',
+          whiteSpace: 'pre-wrap',  // <--- THIS IS THE MAGIC FIX
+          wordBreak: 'break-word', // Prevents long text from breaking layout
           color: log.type === 'user' ? '#fff' : 
                  log.type === 'error' ? '#ff3333' : 
                  log.type === 'success' ? '#00ff41' : '#00ff41' 
@@ -246,4 +248,3 @@ export default function Terminal() {
       <div ref={bottomRef} />
     </div>
   );
-}
