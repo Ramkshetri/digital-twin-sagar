@@ -17,12 +17,14 @@ const fileSystem: Record<string, string[]> = {
 };
 
 const fileContents: Record<string, string> = {
-  "digital-twin.txt": "STATUS: Production Ready. Stack: Next.js 14, Vercel, MCP.",
+  "digital-twin.txt": "STATUS: Production Ready. Stack: Next.js 16+, Vercel, Neon Postgres.",
   "mcp-server.md": "Architecture: Decoupled logic using Model Context Protocol.",
   "cybersecurity.md": "Skills: Penetration Testing, WAF Configuration, Threat Analysis.",
   "react.ts": "Proficiency: Hooks, Context API, Server Components.",
   "email.txt": "contact@sagar.dev (Simulated)",
-  "encrypted-flag.bin": "FATAL: ROOT ACCESS REQUIRED TO DECRYPT."
+  "encrypted-flag.bin": "FATAL: ROOT ACCESS REQUIRED TO DECRYPT.",
+  // --- CTF HIDDEN FILE CONTENT ---
+  ".env.local": "FLAG{unsecured_env_variables_found_1337}" 
 };
 
 export default function Terminal() {
@@ -33,7 +35,7 @@ export default function Terminal() {
   const [logs, setLogs] = useState<LogEntry[]>([
     { type: 'system', content: 'INITIALIZING SECURITY PROTOCOLS...' },
     { type: 'system', content: 'CONNECTING TO VERCEL EDGE NETWORK... [OK]' },
-    { type: 'ai', content: 'SagarOS v2.0 Online. Type "help" for commands.' },
+    { type: 'ai', content: 'SagarOS v2.0 Online. Type "help" or "cv" to begin.' },
   ]);
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -59,6 +61,7 @@ export default function Terminal() {
     // --- COMMAND: HELP ---
     if (command === 'help') {
       response = `AVAILABLE BINARIES:
+  cv            View professional resume / profile
   ls            List directory contents
   cd [dir]      Change directory
   cat [file]    Read file content
@@ -71,26 +74,44 @@ export default function Terminal() {
   clear         Clear terminal`;
     }
     
+    // --- COMMAND: CV (RECRUITER MODE) ---
+    else if (command === 'cv' || command === 'whoami') {
+      response = `======================================================
+:: PROFILE ::
+Name:        Sagar
+Role:        Cybersecurity Architect & Full-Stack Developer
+Status:      International Student | Graduating May 2026
+Target Base: Sydney, Australia
+
+:: CORE COMPETENCIES ::
+> Defensive Security: Edge Middleware WAF, Traffic Analysis
+> Infrastructure:     Next.js App Router, Vercel Edge, Neon Postgres
+> Offensive Skills:   Ethical Hacking, OWASP Vulnerability Testing
+
+:: CURRENT INITIATIVE ::
+Developing "Digital Twin III" — A cyber-hardened application 
+designed to detect, log, and mitigate real-time threat activity.
+======================================================`;
+      type = 'success';
+    }
+
     // --- COMMAND: THREAT-INTEL (SOC DASHBOARD) ---
     else if (command === 'threat-intel') {
       setLogs(newLogs);
       setInput('');
-      
       const threats = [
         "ESTABLISHING SECURE CONNECTION TO FIREWALL LOGS...",
         "ANALYZING REAL-TIME TRAFFIC...",
         "---------------------------------------------------",
-        "[BLOCKED] IP: 45.22.19.112 | TIME: 10:42:05 | RULE: SQL_INJECTION_FILTER",
-        "[BLOCKED] IP: 88.12.99.23  | TIME: 10:45:11 | RULE: BAD_BOT (sqlmap)",
-        "[BLOCKED] IP: 102.33.1.55  | TIME: 10:50:44 | RULE: GEO_BLOCK (Unknown Region)",
+        "[BLOCKED] IP: 45.22.19.112 | RULE: SQL_INJECTION_FILTER",
+        "[BLOCKED] IP: 88.12.99.23  | RULE: BAD_BOT (sqlmap)",
+        "[BLOCKED] IP: 102.33.1.55  | RULE: GEO_BLOCK (Unknown Region)",
         "[WARNING] PORT SCAN DETECTED FROM 192.168.0.5",
         "---------------------------------------------------",
         "STATUS: PERIMETER SECURE. 4 CRITICAL THREATS MITIGATED."
       ];
-
       threats.forEach((line, i) => {
         setTimeout(() => {
-          // Use 'error' type (Red) for blocked items to look like alerts
           const msgType = line.includes('[BLOCKED]') ? 'error' : 'ai';
           setLogs(prev => [...prev, { type: msgType, content: line }]);
         }, i * 400);
@@ -98,10 +119,16 @@ export default function Terminal() {
       return;
     }
 
-    // --- COMMAND: LS ---
+    // --- COMMAND: LS (WITH HIDDEN CTF FLAG) ---
     else if (command === 'ls') {
-      const files = fileSystem[currentPath];
-      response = files ? files.join("    ") : "";
+      let files = fileSystem[currentPath] || [];
+      // If user types 'ls -a' in the root directory, show the hidden file
+      if (target === '-a' && currentPath === "~") {
+        files = [...files, ".env.local"];
+      } else if (target === '-a') {
+        files = [...files, ".hidden"];
+      }
+      response = files.length > 0 ? files.join("    ") : "";
     }
 
     // --- COMMAND: CD ---
@@ -130,6 +157,8 @@ export default function Terminal() {
         type = 'error';
       } else if (fileContents[target]) {
         response = fileContents[target];
+        // Make the flag turn green if they find it
+        if (target === ".env.local") type = 'success'; 
       } else {
         response = `cat: ${target}: No such file or directory`;
         type = 'error';
