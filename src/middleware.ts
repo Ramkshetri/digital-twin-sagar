@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { db } from './db';
-import { threatLogs } from './db/schema';
+import { db } from './src/db'; // Double check this path based on your previous working version!
+import { threatLogs } from './src/db/schema';
+
 export async function middleware(request: NextRequest) {
   // 1. Extract attacker telemetry
   const userAgent = request.headers.get('user-agent') || 'Unknown';
@@ -11,21 +12,35 @@ export async function middleware(request: NextRequest) {
   const geo = request.geo?.country || 'Unknown Region';
 
   // 2. Define our Threat Intelligence Rule
-  const isSqlmap = userAgent.toLowerCase().includes('sqlmap');
+  const ua = userAgent.toLowerCase();
+  
+  let attackDetected = false;
+  let attackSignature = '';
+
+  if (ua.includes('sqlmap')) {
+    attackDetected = true;
+    attackSignature = 'SQL_INJECTION_SCANNER (sqlmap)';
+  } else if (ua.includes('nmap')) {
+    attackDetected = true;
+    attackSignature = 'NETWORK_RECONNAISSANCE (nmap)';
+  } else if (ua.includes('nikto')) {
+    attackDetected = true;
+    attackSignature = 'WEB_VULNERABILITY_SCANNER (nikto)';
+  }
 
   // 3. The "Log and Drop" Action
-  if (isSqlmap) {
+  if (attackDetected) {
     try {
-      // Send the telemetry to our Neon Database instantly
       await db.insert(threatLogs).values({
         ipAddress: ip,
         geoRegion: geo,
         userAgent: userAgent,
-        attackType: 'SQL_INJECTION_SCANNER (sqlmap)',
+        attackType: attackSignature,
         blocked: true,
       });
-      console.log(`[DEFENSE ACTIVE] Logged sqlmap attack from ${ip}`);
+      console.log(`[DEFENSE ACTIVE] Logged ${attackSignature} from ${ip}`);
     } catch (error) {
+      // If the database fails, we still want to block the attacker!
       console.error('Failed to write threat log to DB:', error);
     }
 
