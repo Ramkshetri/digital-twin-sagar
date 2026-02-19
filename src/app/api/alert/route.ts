@@ -9,7 +9,7 @@ export async function POST(req: Request) {
 
     await resend.emails.send({
       from: 'SOC-Lab <onboarding@resend.dev>',
-      to: ['aryalsagar12go@gmail.com'], 
+      to: 's8099186@live.vu.edu.au', 
       subject: `🚨 SOC ALERT: Blocked ${type}`,
       html: `
         <div style="font-family: sans-serif; border: 1px solid #333; padding: 20px;">
