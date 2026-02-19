@@ -29,6 +29,7 @@ export async function middleware(request: NextRequest) {
 
   // 3. The "Log and Drop" Action
   if (attackDetected) {
+    // 1. Log to Database (We already do this)
     try {
       await db.insert(threatLogs).values({
         ipAddress: ip,
@@ -37,15 +38,18 @@ export async function middleware(request: NextRequest) {
         attackType: attackSignature,
         blocked: true,
       });
-      console.log(`[DEFENSE ACTIVE] Logged ${attackSignature} from ${ip}`);
-    } catch (error) {
-      // If the database fails, we still want to block the attacker!
-      console.error('Failed to write threat log to DB:', error);
-    }
 
-    // Drop the connection with a 403 Forbidden status
-    return NextResponse.json(
-      { success: false, message: "Access Denied by WAF: Malicious Scanner Detected", flag: "FLAG{layer_7_edge_defense_active}" },
+      // 2. Trigger Email Alert (New!)
+      // We use fetch here so the middleware doesn't wait for the email to send
+      fetch(`${request.nextUrl.origin}/api/alert`, {
+        method: 'POST',
+        body: JSON.stringify({ ip, type: attackSignature, geo }),
+      });
+
+    } catch (error) {
+      console.error('Defense logging failed:', error);
+    }return NextResponse.json(
+      { success: false, message: "Access Denied by WAF: Malicious Scanner Detected" },
       { status: 403 }
     );
   }
