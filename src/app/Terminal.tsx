@@ -74,26 +74,98 @@ export default function Terminal() {
   clear         Clear terminal`;
     }
     
-    // --- COMMAND: CV (RECRUITER MODE) ---
-    else if (command === 'cv' || command === 'whoami') {
-      response = `======================================================
+    // --- COMMAND: CV (RECRUITER MODE - SECURITY JOB READY) ---
+else if (command === 'cv' || command === 'whoami') {
+  response = `
+======================================================
 :: PROFILE ::
-Name:        Sagar
-Role:        Cybersecurity Architect & Full-Stack Developer
-Status:      International Student | Graduating May 2026
-Target Base: Sydney, Australia
+Name:        Sagar Aryal
+Role:        Cybersecurity Graduate (Security Engineering Focus)
+Location:    Sydney, NSW
+Graduation:  Bachelor of Cybersecurity – April 2026
+Availability: Open to Graduate / Junior Security Roles
 
-:: CORE COMPETENCIES ::
-> Defensive Security: Edge Middleware WAF, Traffic Analysis
-> Infrastructure:     Next.js App Router, Vercel Edge, Neon Postgres
-> Offensive Skills:   Ethical Hacking, OWASP Vulnerability Testing
+:: PROFESSIONAL SUMMARY ::
+Cybersecurity student with hands-on experience building 
+secure applications, implementing encryption, deploying 
+cloud-based architectures, and performing vulnerability testing. 
+Strong foundation in networking, system security, and threat detection.
 
-:: CURRENT INITIATIVE ::
-Developing "Digital Twin III" — A cyber-hardened application 
-designed to detect, log, and mitigate real-time threat activity.
+Seeking entry-level SOC Analyst / Security Engineer role 
+to apply defensive security skills in real-world environments.
+
+:: TECHNICAL SKILLS ::
+
+> Application Security:
+  - AES file encryption implementation
+  - OTP-based authentication systems
+  - Secure session handling
+  - OWASP Top 10 testing (XSS, SQLi)
+
+> Cloud & Infrastructure:
+  - Vercel deployment
+  - Edge middleware security
+  - Arcjet WAF integration
+  - Zero-Trust architecture concepts
+
+> Networking & Systems:
+  - VLAN configuration
+  - Subnetting & IP planning
+  - NAT & routing
+  - Wireshark packet analysis
+  - Docker containerisation
+
+> Monitoring & Defensive Security:
+  - Threat logging systems
+  - Traffic inspection
+  - Secure configuration management
+  - Risk assessment fundamentals
+
+:: KEY PROJECT EXPERIENCE ::
+
+SecureShare – Secure File Sharing System
+  - Developed full-stack Flask application
+  - Implemented AES encryption for files at rest
+  - Built OTP authentication mechanism
+  - Designed secure upload/download architecture
+  - Integrated role-based access logic
+
+Digital Twin III – Security-Focused Internship Project
+  - Built Next.js application with hardened deployment
+  - Integrated Web Application Firewall (Arcjet)
+  - Implemented threat telemetry logging
+  - Applied Zero-Trust design principles
+
+Virtualisation & Docker Project
+  - Containerised Apache/MySQL/WordPress stack
+  - Configured secure access policies
+  - Managed network isolation & port control
+
+:: CERTIFICATION ::
+CompTIA Security+ – In Progress
+
+:: PROFESSIONAL EXPERIENCE ::
+
+Warehouse Assistant – Sydney Direct Fresh Produce
+  - Operate high-reach forklift in fast-paced environment
+  - Maintain operational accuracy under pressure
+  - Demonstrate reliability, discipline, and safety compliance
+
+:: STRENGTHS ::
+  - Strong security mindset
+  - Detail-oriented and analytical
+  - Comfortable with both infrastructure and code
+  - Quick learner with hands-on approach
+
+:: TARGET ROLES ::
+  - SOC Analyst (Level 1)
+  - Junior Security Engineer
+  - Cybersecurity Graduate
+  - Cloud Security Associate
 ======================================================`;
-      type = 'success';
-    }
+  type = 'success';
+}
+
 
     // --- COMMAND: THREAT-INTEL (SOC DASHBOARD) ---
     // --- COMMAND: THREAT-INTEL (LIVE SOC DASHBOARD) ---
@@ -240,6 +312,14 @@ designed to detect, log, and mitigate real-time threat activity.
       setIsRoot(true);
       response = "ROOT ACCESS GRANTED. USE WITH CAUTION.";
       type = 'success';
+    }
+    // --- COMMAND: EXIT (LEAVE ROOT MODE) ---
+    else if (command === 'exit') {
+      // Assuming you have a state variable like 'isRoot' or 'user' controlling the prompt
+      setIsRoot(false); // Change this to whatever state you used for 'sudo su'
+      setLogs(prev => [...prev, { type: 'system', content: 'logout' }]);
+      setInput('');
+      return;
     }
 
     // --- COMMAND: CLEAR ---
