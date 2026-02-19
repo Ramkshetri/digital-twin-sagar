@@ -1,8 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { db } from './src/db';
-import { threatLogs } from './src/db/schema';
-
+import { db } from './db';
+import { threatLogs } from './db/schema';
 export async function middleware(request: NextRequest) {
   // 1. Extract attacker telemetry
   const userAgent = request.headers.get('user-agent') || 'Unknown';
