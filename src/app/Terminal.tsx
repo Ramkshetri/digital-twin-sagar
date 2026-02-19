@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
-
+import { getRecentThreats } from './actions';
 type LogEntry = {
   type: 'system' | 'user' | 'ai' | 'error' | 'success';
   content: string;
@@ -96,26 +96,42 @@ designed to detect, log, and mitigate real-time threat activity.
     }
 
     // --- COMMAND: THREAT-INTEL (SOC DASHBOARD) ---
+    // --- COMMAND: THREAT-INTEL (LIVE SOC DASHBOARD) ---
     else if (command === 'threat-intel') {
       setLogs(newLogs);
       setInput('');
-      const threats = [
-        "ESTABLISHING SECURE CONNECTION TO FIREWALL LOGS...",
-        "ANALYZING REAL-TIME TRAFFIC...",
-        "---------------------------------------------------",
-        "[BLOCKED] IP: 45.22.19.112 | RULE: SQL_INJECTION_FILTER",
-        "[BLOCKED] IP: 88.12.99.23  | RULE: BAD_BOT (sqlmap)",
-        "[BLOCKED] IP: 102.33.1.55  | RULE: GEO_BLOCK (Unknown Region)",
-        "[WARNING] PORT SCAN DETECTED FROM 192.168.0.5",
-        "---------------------------------------------------",
-        "STATUS: PERIMETER SECURE. 4 CRITICAL THREATS MITIGATED."
-      ];
-      threats.forEach((line, i) => {
+      
+      // Initial loading message
+      setLogs(prev => [...prev, { type: 'system', content: 'ESTABLISHING SECURE CONNECTION TO NEON POSTGRES...' }]);
+
+      // Fetch the real data asynchronously
+      getRecentThreats().then((threats) => {
+        if (threats.length === 0) {
+          setLogs(prev => [...prev, { type: 'ai', content: 'STATUS: PERIMETER SECURE. NO RECENT THREATS RECORDED.' }]);
+          return;
+        }
+
+        setLogs(prev => [...prev, { type: 'system', content: 'ANALYZING REAL-TIME TRAFFIC...' }]);
+        setLogs(prev => [...prev, { type: 'ai', content: '---------------------------------------------------' }]);
+
+        threats.forEach((threat, i) => {
+          setTimeout(() => {
+            // Format the timestamp nicely
+            const time = new Date(threat.timestamp || Date.now()).toLocaleTimeString();
+            const logLine = `[BLOCKED] IP: ${threat.ipAddress} | TIME: ${time} | RULE: ${threat.attackType}`;
+            setLogs(prev => [...prev, { type: 'error', content: logLine }]);
+          }, i * 400);
+        });
+
         setTimeout(() => {
-          const msgType = line.includes('[BLOCKED]') ? 'error' : 'ai';
-          setLogs(prev => [...prev, { type: msgType, content: line }]);
-        }, i * 400);
+          setLogs(prev => [...prev, { type: 'ai', content: '---------------------------------------------------' }]);
+          setLogs(prev => [...prev, { type: 'success', content: `STATUS: ${threats.length} CRITICAL THREATS MITIGATED FROM EDGE WAF.` }]);
+        }, threats.length * 400 + 200);
+
+      }).catch(() => {
+        setLogs(prev => [...prev, { type: 'error', content: 'FATAL: COULD NOT REACH DATABASE.' }]);
       });
+      
       return;
     }
 
