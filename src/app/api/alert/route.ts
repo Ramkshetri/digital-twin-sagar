@@ -9,22 +9,26 @@ export async function POST(req: Request) {
 
     await resend.emails.send({
       from: 'SOC-Lab <onboarding@resend.dev>',
-      to: ['your-email@example.com'], // CHANGE THIS TO YOUR ACTUAL EMAIL
+      to: ['s8099186@live.vu.edu.au'], // <--- PUT YOUR EMAIL HERE
       subject: `🚨 SOC ALERT: Blocked ${type}`,
       html: `
-        <h2>Edge WAF Threat Detection</h2>
-        <p><strong>Status:</strong> Connection Dropped (403)</p>
-        <ul>
-          <li><strong>Attacker IP:</strong> ${ip}</li>
-          <li><strong>Attack Type:</strong> ${type}</li>
-          <li><strong>Location:</strong> ${geo}</li>
-        </ul>
-        <p><em>This alert was triggered by your Digital Twin III Security Pipeline.</em></p>
+        <div style="font-family: sans-serif; border: 1px solid #333; padding: 20px;">
+          <h2 style="color: #e11d48;">Edge WAF Threat Detection</h2>
+          <p><strong>Status:</strong> Connection Dropped (403)</p>
+          <hr />
+          <ul>
+            <li><strong>Attacker IP:</strong> ${ip}</li>
+            <li><strong>Attack Type:</strong> ${type}</li>
+            <li><strong>Location:</strong> ${geo}</li>
+          </ul>
+          <p><em>Security log recorded in Neon Postgres (Sydney Region).</em></p>
+        </div>
       `
     });
 
     return NextResponse.json({ success: true });
   } catch (error) {
+    console.error("Resend Error:", error);
     return NextResponse.json({ error: 'Alert failed' }, { status: 500 });
   }
 }
