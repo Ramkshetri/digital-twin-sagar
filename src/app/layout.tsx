@@ -12,7 +12,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        {/* WARNING TO DEV TEAM: Do not leave the admin override hash (FLAG{html_source_code_recon_expert}) in production! */}
+        {children}</body>
     </html>
   );
 }
