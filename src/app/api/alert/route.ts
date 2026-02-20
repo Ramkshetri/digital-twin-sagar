@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
 import { Resend } from 'resend';
-import { db } from '@/db'; // Adjust this if your db folder is elsewhere
-import { threatLogs } from '@/db/schema'; // Using your exact schema name
-
+// Swap these two lines to use relative paths instead of the @ alias
+import { db } from '../../../db'; 
+import { threatLogs } from '../../../db/schema';
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function POST(req: Request) {
