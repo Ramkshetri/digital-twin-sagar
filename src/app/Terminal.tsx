@@ -2,9 +2,12 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { getRecentThreats } from './actions';
+import { ThreatMap } from '../components/ThreatMap';
+
+// UPDATED: Content now accepts ReactNode to allow the ThreatMap component
 type LogEntry = {
-  type: 'system' | 'user' | 'ai' | 'error' | 'success';
-  content: string;
+  type: 'system' | 'user' | 'ai' | 'error' | 'success' | 'component';
+  content: string | React.ReactNode;
 };
 
 // --- MOCK FILE SYSTEM ---
@@ -74,8 +77,8 @@ export default function Terminal() {
     }
     
     // --- COMMAND: CV ---
-else if (command === 'cv' || command === 'whoami') {
-  response = `
+    else if (command === 'cv' || command === 'whoami') {
+      response = `
 ======================================================
 :: PROFILE ::
 Name:         Sagar Aryal
@@ -102,24 +105,12 @@ Digital Twin III (Next.js + Vercel + Neon)
   - Implemented request filtering + telemetry capture for suspicious patterns
   - Designed for least-privilege, production configuration, and auditability
 
-SecureShare (Flask Secure File Sharing)
-  - Implemented AES encryption for files at rest
-  - Built OTP-based login verification workflow
-  - Designed secure upload/download logic and access controls
-
-:: CERTIFICATION ::
-CompTIA Security+ — In Progress
-
-:: TARGET ROLES ::
-SOC Analyst (L1) | Junior Security Engineer | Cybersecurity Graduate
-Cloud Security Associate | Security Operations / Monitoring
-
 :: LINKS ::
 GitHub:  github.com/Ramkshetri
 Live:    digital-twin-sagar.vercel.app
 ======================================================`;
-  type = 'success';
-}
+      type = 'success';
+    }
 
     // --- COMMAND: THREAT-INTEL ---
     else if (command === 'threat-intel') {
@@ -135,20 +126,24 @@ Live:    digital-twin-sagar.vercel.app
         }
 
         setLogs(prev => [...prev, { type: 'system', content: 'ANALYZING REAL-TIME TRAFFIC...' }]);
-        setLogs(prev => [...prev, { type: 'ai', content: '---------------------------------------------------' }]);
 
         threats.forEach((threat, i) => {
           setTimeout(() => {
             const time = new Date(threat.timestamp || Date.now()).toLocaleTimeString();
             const logLine = `[BLOCKED] IP: ${threat.ipAddress} | TIME: ${time} | RULE: ${threat.attackType}`;
             setLogs(prev => [...prev, { type: 'error', content: logLine }]);
-          }, i * 400);
+          }, i * 300);
         });
 
         setTimeout(() => {
-          setLogs(prev => [...prev, { type: 'ai', content: '---------------------------------------------------' }]);
           setLogs(prev => [...prev, { type: 'success', content: `STATUS: ${threats.length} CRITICAL THREATS MITIGATED FROM EDGE WAF.` }]);
-        }, threats.length * 400 + 200);
+          
+          // ADDING THE VISUAL RADAR MAP
+          setLogs(prev => [...prev, { 
+            type: 'component', 
+            content: <ThreatMap threats={threats} /> 
+          }]);
+        }, threats.length * 300 + 500);
 
       }).catch(() => {
         setLogs(prev => [...prev, { type: 'error', content: 'FATAL: COULD NOT REACH DATABASE.' }]);
@@ -156,19 +151,17 @@ Live:    digital-twin-sagar.vercel.app
       
       return;
     }
-    // --- COMMAND: ATTACK (SIMULATE WAF TRIGGER) ---
+
+    // --- COMMAND: ATTACK ---
     else if (command === 'attack') {
       if (!target) {
         response = "usage: attack [sqli | xss | ddos]";
         type = 'error';
       } else {
-        // 1. Clear input and log the initial attempt
         setLogs(newLogs);
         setInput('');
-        
         setLogs(prev => [...prev, { type: 'system', content: `[WAF_TEST] Transmitting malicious payload: ${target.toUpperCase()}...` }]);
 
-        // 2. Hit your Next.js API route to trigger the backend WAF and Resend Email
         fetch('/api/alert', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -179,15 +172,11 @@ Live:    digital-twin-sagar.vercel.app
         })
         .then(async (res) => {
           if (res.status === 403 || res.status === 200) {
-            // WAF successfully blocked it
             const data = await res.json();
             setLogs(prev => [...prev, { type: 'error', content: `[CONNECTION DROPPED] ${data.message}` }]);
-            
-            // Add a slight delay for dramatic effect before showing the email alert confirmation
             setTimeout(() => {
               setLogs(prev => [...prev, { type: 'success', content: "🚨 ALERT DISPATCHED: SOC Admin notified via secure SMTP." }]);
             }, 600);
-            
           } else {
             setLogs(prev => [...prev, { type: 'error', content: "ERROR: WAF failed to respond correctly." }]);
           }
@@ -195,8 +184,7 @@ Live:    digital-twin-sagar.vercel.app
         .catch(() => {
           setLogs(prev => [...prev, { type: 'error', content: "FATAL: Connection to Edge WAF severed." }]);
         });
-        
-        return; // Early return because the fetch handles the log updates asynchronously
+        return;
       }
     }
 
@@ -236,88 +224,11 @@ Live:    digital-twin-sagar.vercel.app
       }
     }
 
-    // --- COMMAND: STATUS ---
-    else if (command === 'status') {
-      response = `[SYSTEM METRICS]
-> Uptime: 99.999%
-> Firewall: ACTIVE (Middleware WAF)
-> Security: ${isRoot ? 'ROOT ACCESS DETECTED' : 'Standard Privileges'}
-> Connection: Encrypted (TLS 1.3)`;
-    }
-
-    // --- COMMAND: TRACE ---
-    else if (command === 'trace') {
-      setLogs(newLogs);
-      setInput('');
-      const hops = [
-        "TRACEROUTE to target-vault (192.168.X.X), 30 hops max",
-        "1  10.0.0.1 (gateway)       0.452 ms",
-        "2  172.16.254.1 (isp-node)  12.4 ms",
-        "3  45.33.12.9 (backbone)    24.1 ms",
-        "4  104.22.4.1 (vercel-edge) 11.2 ms",
-        "5  TARGET [SECURED] REACHED."
-      ];
-      hops.forEach((hop, i) => {
-        setTimeout(() => {
-          setLogs(prev => [...prev, { type: 'ai', content: hop }]);
-        }, i * 500);
-      });
-      return; 
-    }
-
-    // --- COMMAND: ENCRYPT ---
-    else if (command === 'encrypt') {
-      if (!extra) {
-        response = "usage: encrypt [text]";
-      } else {
-        response = `[OUTPUT]: ${btoa(extra)}`;
-        type = 'success';
-      }
-    }
-
-    // --- COMMAND: DECRYPT ---
-    else if (command === 'decrypt') {
-      if (!extra) {
-        response = "usage: decrypt [text]";
-      } else {
-        try {
-          response = `[OUTPUT]: ${atob(extra)}`;
-          type = 'success';
-        } catch {
-          response = "ERROR: Invalid Base64 string.";
-          type = 'error';
-        }
-      }
-    }
-
-    // --- COMMAND: SUDO ---
-    else if (command === 'sudo' && target === 'su') {
-      setIsRoot(true);
-      response = "ROOT ACCESS GRANTED. ADMINISTRATIVE FUNCTIONS UNLOCKED.";
-      type = 'success';
-    }
-    // --- COMMAND: EXIT ---
-    else if (command === 'exit') {
-      if (isRoot) {
-        setIsRoot(false);
-        response = "Root session terminated. Returning to standard privileges.";
-        type = 'system';
-      } else {
-         response = "Session already running at standard privileges.";
-      }
-    }
-
     // --- COMMAND: CLEAR ---
     else if (command === 'clear') {
       setLogs([]);
       setInput('');
       return;
-    }
-
-    // --- UNKNOWN ---
-    else if (rawCmd !== "") {
-      response = `Command '${command}' not found. Type 'help' for list.`;
-      type = 'error';
     }
 
     // Update Logs
@@ -338,7 +249,7 @@ Live:    digital-twin-sagar.vercel.app
       borderRadius: '8px', 
       padding: '20px', 
       fontFamily: 'Courier New, monospace', 
-      height: '500px', 
+      height: '600px', 
       overflowY: 'auto' 
     }}>
       {logs.map((log, i) => (
@@ -349,9 +260,12 @@ Live:    digital-twin-sagar.vercel.app
           wordBreak: 'break-word', 
           color: log.type === 'user' ? '#fff' : 
                  log.type === 'error' ? '#ff3333' : 
-                 log.type === 'success' ? '#00ff41' : '#00ff41' 
+                 log.type === 'success' ? '#00ff41' : 
+                 log.type === 'component' ? 'inherit' : '#00ff41' 
         }}>
-          {log.type === 'user' ? '' : <span style={{ marginRight: '10px', opacity: 0.7 }}>{'>'}</span>}
+          {log.type !== 'user' && log.type !== 'component' && (
+            <span style={{ marginRight: '10px', opacity: 0.7 }}>{'>'}</span>
+          )}
           {log.content}
         </div>
       ))}
