@@ -178,7 +178,7 @@ Live:    digital-twin-sagar.vercel.app
           })
         })
         .then(async (res) => {
-          if (res.status === 403) {
+          if (res.status === 403 || res.status === 200) {
             // WAF successfully blocked it
             const data = await res.json();
             setLogs(prev => [...prev, { type: 'error', content: `[CONNECTION DROPPED] ${data.message}` }]);
