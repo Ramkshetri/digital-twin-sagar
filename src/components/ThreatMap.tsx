@@ -22,7 +22,7 @@ export const ThreatMap = ({ threats }: { threats: Threat[] }) => {
     }}>
       <pre style={{ fontSize: '12px', lineHeight: '1.2', margin: 0 }}>
 {`       _..-''-._                            
-     .' .'_  _  '.          ${hasUS ? "🚨 [ TARGET: NORTH AMER ]" : "[ NORTH AMER: SECURE ]"}
+     .' .'_  _  '.          ${hasUS ? "🚨 [ TARGET: NORTH AMERICA ]" : "[ NORTH AMER: SECURE ]"}
     /  /   ''    \\ \\        ______________________
    |  |  _  _  |  |  |      ${hasAU ? "🚨 [ TARGET: AUSTRALIA  ]" : "[ AUSTRALIA: SECURE  ]"}
     \\  \\  ''  /  /    /     ______________________
