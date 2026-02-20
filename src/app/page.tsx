@@ -2,61 +2,48 @@ import Terminal from "./Terminal";
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-[#020202] text-green-400 p-6 md:p-12 font-mono selection:bg-green-900 selection:text-green-100 flex flex-col">
-      <div className="max-w-6xl mx-auto w-full flex-grow flex flex-col">
+    <div style={{ 
+      backgroundColor: '#0a0a0a', 
+      color: '#00ff41', 
+      minHeight: '100vh', 
+      padding: '50px', 
+      fontFamily: 'Courier New, monospace' 
+    }}>
+      <header style={{ borderBottom: '1px solid #00ff41', marginBottom: '30px', paddingBottom: '20px' }}>
+        <h1 style={{ fontSize: '2.5rem', margin: '0 0 10px 0', color: '#fff' }}>{'>'} DIGITAL_TWIN: SAGAR_</h1>
+        <p style={{ color: '#888', margin: 0 }}>
+          [Role: Cybersecurity Architect | Status: <span style={{ color: '#00ff41' }}>Protected</span>]
+        </p>
+        <p style={{ color: '#555', fontSize: '0.8rem', marginTop: '10px' }}>
+          SERVER_TIME: {new Date().toLocaleTimeString('en-AU', { timeZone: 'Australia/Sydney' })} AEDT<br/>
+          NODE: SYD_EDGE_01
+        </p>
+      </header>
+
+      <section style={{ marginBottom: '40px' }}>
+        <h3 style={{ color: '#888', borderLeft: '2px solid #00ff41', paddingLeft: '10px', letterSpacing: '2px' }}>SYSTEM_METRICS</h3>
+        <ul style={{ listStyle: 'none', padding: '15px', backgroundColor: '#111', border: '1px solid #333', borderRadius: '5px' }}>
+          <li style={{ marginBottom: '10px' }}><span style={{ color: '#555' }}>● STATUS:</span> <span style={{ color: '#fff', fontWeight: 'bold' }}>ONLINE</span></li>
+          <li style={{ marginBottom: '10px' }}><span style={{ color: '#555' }}>● DEPLOYMENT:</span> <span style={{ color: '#fff', fontWeight: 'bold' }}>VERCEL_EDGE</span></li>
+          <li><span style={{ color: '#555' }}>● INTERFACE:</span> <span style={{ color: '#fff', fontWeight: 'bold' }}>SagarOS_CLI_v2.0</span></li>
+        </ul>
+      </section>
+
+      <section>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '15px' }}>
+          <h3 style={{ color: '#888', borderLeft: '2px solid #00ff41', paddingLeft: '10px', letterSpacing: '2px', margin: 0 }}>SECURE_COMMUNICATION_CHANNEL</h3>
+          <p style={{ fontSize: '0.9rem', color: '#555', margin: 0 }}>
+            // Initiate interaction via CLI.
+          </p>
+        </div>
         
-        {/* HEADER */}
-        <header className="border-b border-green-500/30 pb-6 mb-8 flex flex-col md:flex-row md:justify-between md:items-end gap-4">
-          <div>
-            <h1 className="text-3xl md:text-5xl font-bold text-gray-100 tracking-tighter drop-shadow-[0_0_8px_rgba(255,255,255,0.2)]">
-              {'>'} DIGITAL_TWIN: SAGAR_
-            </h1>
-            <p className="text-gray-500 mt-2 text-sm md:text-base">
-              [Role: Cybersecurity Architect | Status: <span className="text-green-500 animate-pulse drop-shadow-[0_0_5px_rgba(74,222,128,0.5)]">Protected</span>]
-            </p>
-          </div>
-          <div className="text-xs text-gray-600 text-left md:text-right">
-            SERVER_TIME: {new Date().toLocaleTimeString('en-AU', { timeZone: 'Australia/Sydney' })} AEDT<br/>
-            NODE: SYD_EDGE_01
-          </div>
-        </header>
+        <Terminal />
+        
+      </section>
 
-        {/* METRICS DASHBOARD */}
-        <section className="mb-10">
-          <h3 className="text-gray-400 mb-4 text-sm tracking-widest border-l-2 border-green-500 pl-2">SYSTEM_METRICS</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm bg-[#0a0a0a] border border-gray-800 p-4 rounded-lg shadow-inner">
-            <div className="flex justify-between md:block">
-              <span className="text-gray-500">● STATUS:</span> <span className="text-gray-100 font-semibold drop-shadow-[0_0_5px_rgba(255,255,255,0.3)] ml-2">ONLINE</span>
-            </div>
-            <div className="flex justify-between md:block">
-              <span className="text-gray-500">● DEPLOYMENT:</span> <span className="text-gray-100 font-semibold ml-2">VERCEL_EDGE</span>
-            </div>
-            <div className="flex justify-between md:block">
-              <span className="text-gray-500">● INTERFACE:</span> <span className="text-gray-100 font-semibold ml-2">SagarOS_CLI_v2.0</span>
-            </div>
-          </div>
-        </section>
-
-        {/* TERMINAL SECTION */}
-        <section className="flex-grow flex flex-col">
-          <div className="flex justify-between items-end mb-4">
-            <h3 className="text-gray-400 text-sm tracking-widest border-l-2 border-green-500 pl-2">SECURE_COMMUNICATION_CHANNEL</h3>
-            <p className="text-xs text-gray-500 hidden md:block">
-              // Initiate interaction via CLI.
-            </p>
-          </div>
-          
-          <div className="flex-grow shadow-[0_0_30px_rgba(0,255,65,0.03)] rounded-xl">
-            <Terminal />
-          </div>
-        </section>
-
-        {/* FOOTER */}
-        <footer className="mt-12 text-center text-xs text-gray-600 border-t border-gray-900 pt-6">
-          © 2026 SAGAR // SOLA_FIDE_EXECUTION // CLASS_OF_2026
-        </footer>
-
-      </div>
+      <footer style={{ marginTop: '50px', paddingTop: '20px', borderTop: '1px solid #222', fontSize: '0.8rem', color: '#444', textAlign: 'center' }}>
+        © 2026 SAGAR // SOLA_FIDE_EXECUTION // CLASS_OF_2026
+      </footer>
     </div>
   );
 }

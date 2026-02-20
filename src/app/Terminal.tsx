@@ -72,96 +72,55 @@ export default function Terminal() {
   clear         Clear terminal`;
     }
     
-    // --- COMMAND: CV (RECRUITER MODE - SECURITY JOB READY) ---
-    else if (command === 'cv' || command === 'whoami') {
-      response = `
+    // --- COMMAND: CV ---
+else if (command === 'cv' || command === 'whoami') {
+  response = `
 ======================================================
 :: PROFILE ::
-Name:        Sagar Aryal
-Role:        Cybersecurity Graduate (Security Engineering Focus)
-Location:    Sydney, NSW
-Graduation:  Bachelor of Cybersecurity – April 2026
-Availability: Open to Graduate / Junior Security Roles
+Name:         Sagar Aryal
+Title:        Cybersecurity Graduate | Security Engineering Focus
+Location:     Sydney, NSW
+Graduation:   Bachelor of Cybersecurity (Victoria University) — Apr 2026
+Availability: Graduate / Junior Roles (SOC, SecEng, Cloud Sec)
 
-:: PROFESSIONAL SUMMARY ::
-Cybersecurity student with hands-on experience building 
-secure applications, implementing encryption, deploying 
-cloud-based architectures, and performing vulnerability testing. 
-Strong foundation in networking, system security, and threat detection.
+:: SUMMARY ::
+Hands-on cybersecurity student building and deploying secure web systems.
+Experience implementing edge-layer protections, threat telemetry logging,
+and secure cloud architectures using modern full-stack tooling.
+Strong foundation in networking, OWASP testing, and incident-minded thinking.
 
-Seeking entry-level SOC Analyst / Security Engineer role 
-to apply defensive security skills in real-world environments.
+:: CORE STRENGTHS ::
+> Defensive Security: Edge middleware controls, WAF concepts, traffic analysis
+> AppSec:            OWASP Top 10 testing (XSS/SQLi), secure session patterns
+> Cloud & Infra:     Vercel deployments, Neon Postgres, environment hardening
+> Networking:        Subnetting/VLANs, NAT/routing basics, Wireshark analysis
 
-:: TECHNICAL SKILLS ::
+:: PROJECT HIGHLIGHTS ::
+Digital Twin III (Next.js + Vercel + Neon)
+  - Built a CLI-style security portfolio site with threat-intel dashboard
+  - Implemented request filtering + telemetry capture for suspicious patterns
+  - Designed for least-privilege, production configuration, and auditability
 
-> Application Security:
-  - AES file encryption implementation
-  - OTP-based authentication systems
-  - Secure session handling
-  - OWASP Top 10 testing (XSS, SQLi)
-
-> Cloud & Infrastructure:
-  - Vercel deployment
-  - Edge middleware security
-  - Arcjet WAF integration
-  - Zero-Trust architecture concepts
-
-> Networking & Systems:
-  - VLAN configuration
-  - Subnetting & IP planning
-  - NAT & routing
-  - Wireshark packet analysis
-  - Docker containerisation
-
-> Monitoring & Defensive Security:
-  - Threat logging systems
-  - Traffic inspection
-  - Secure configuration management
-  - Risk assessment fundamentals
-
-:: KEY PROJECT EXPERIENCE ::
-
-SecureShare – Secure File Sharing System
-  - Developed full-stack Flask application
+SecureShare (Flask Secure File Sharing)
   - Implemented AES encryption for files at rest
-  - Built OTP authentication mechanism
-  - Designed secure upload/download architecture
-  - Integrated role-based access logic
+  - Built OTP-based login verification workflow
+  - Designed secure upload/download logic and access controls
 
-Digital Twin III – Security-Focused Project
-  - Built Next.js application with hardened deployment
-  - Integrated Web Application Firewall
-  - Implemented threat telemetry logging
-  - Applied Zero-Trust design principles
-
-Virtualisation & Docker Project
-  - Containerised Apache/MySQL/WordPress stack
-  - Configured secure access policies
-  - Managed network isolation & port control
-
-:: PROFESSIONAL EXPERIENCE ::
-
-Warehouse Assistant – Sydney Direct Fresh Produce
-  - Operate high-reach forklift in fast-paced environment
-  - Maintain operational accuracy under pressure
-  - Demonstrate reliability, discipline, and safety compliance
-
-:: STRENGTHS ::
-  - Strong security mindset
-  - Detail-oriented and analytical
-  - Comfortable with both infrastructure and code
-  - Quick learner with hands-on approach
+:: CERTIFICATION ::
+CompTIA Security+ — In Progress
 
 :: TARGET ROLES ::
-  - SOC Analyst (Level 1)
-  - Junior Security Engineer
-  - Cybersecurity Graduate
-  - Cloud Security Associate
-======================================================`;
-      type = 'success';
-    }
+SOC Analyst (L1) | Junior Security Engineer | Cybersecurity Graduate
+Cloud Security Associate | Security Operations / Monitoring
 
-    // --- COMMAND: THREAT-INTEL (LIVE SOC DASHBOARD) ---
+:: LINKS ::
+GitHub:  github.com/Ramkshetri
+Live:    digital-twin-sagar.vercel.app
+======================================================`;
+  type = 'success';
+}
+
+    // --- COMMAND: THREAT-INTEL ---
     else if (command === 'threat-intel') {
       setLogs(newLogs);
       setInput('');
@@ -329,47 +288,52 @@ Warehouse Assistant – Sydney Direct Fresh Produce
   };
 
   return (
-    <div className="bg-[#050505] border border-gray-800 rounded-xl p-6 font-mono h-[500px] overflow-y-auto shadow-2xl relative group custom-scrollbar">
-      {/* Optional: Subtle scanline overlay for that authentic terminal feel */}
-      <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] bg-[length:100%_4px,3px_100%] opacity-20" />
-
-      <div className="relative z-10">
-        {logs.map((log, i) => {
-          let textColor = "text-green-400";
-          let dropShadow = "drop-shadow-[0_0_5px_rgba(74,222,128,0.4)]";
-          
-          if (log.type === 'user') {
-            textColor = "text-gray-100";
-            dropShadow = "";
-          } else if (log.type === 'error') {
-            textColor = "text-red-500";
-            dropShadow = "drop-shadow-[0_0_5px_rgba(239,68,68,0.5)]";
-          }
-
-          return (
-            <div key={i} className={`mb-2 leading-relaxed whitespace-pre-wrap break-words ${textColor} ${dropShadow}`}>
-              {log.type === 'user' ? '' : <span className="mr-2 opacity-70">{'>'}</span>}
-              {log.content}
-            </div>
-          );
-        })}
-        
-        <div className="flex items-center mt-6">
-          <span className={`mr-3 ${isRoot ? 'text-red-500 drop-shadow-[0_0_5px_rgba(239,68,68,0.5)]' : 'text-green-400 drop-shadow-[0_0_5px_rgba(74,222,128,0.4)]'}`}>
-            {isRoot ? 'root' : 'visitor'}@sagar:{currentPath} $
-          </span>
-          <input 
-            type="text" 
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleCommand(input)}
-            autoFocus
-            spellCheck={false}
-            className="bg-transparent border-none text-gray-100 flex-1 focus:outline-none focus:ring-0 caret-green-400"
-          />
+    <div style={{ 
+      backgroundColor: '#050505', 
+      border: '1px solid #333', 
+      borderRadius: '8px', 
+      padding: '20px', 
+      fontFamily: 'Courier New, monospace', 
+      height: '500px', 
+      overflowY: 'auto' 
+    }}>
+      {logs.map((log, i) => (
+        <div key={i} style={{ 
+          marginBottom: '8px', 
+          lineHeight: '1.4',
+          whiteSpace: 'pre-wrap', 
+          wordBreak: 'break-word', 
+          color: log.type === 'user' ? '#fff' : 
+                 log.type === 'error' ? '#ff3333' : 
+                 log.type === 'success' ? '#00ff41' : '#00ff41' 
+        }}>
+          {log.type === 'user' ? '' : <span style={{ marginRight: '10px', opacity: 0.7 }}>{'>'}</span>}
+          {log.content}
         </div>
-        <div ref={bottomRef} className="h-4" />
+      ))}
+      <div style={{ display: 'flex', alignItems: 'center', marginTop: '20px' }}>
+        <span style={{ color: isRoot ? '#ff3333' : '#00ff41', marginRight: '10px' }}>
+          {isRoot ? 'root' : 'visitor'}@sagar:{currentPath} $
+        </span>
+        <input 
+          type="text" 
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && handleCommand(input)}
+          autoFocus
+          spellCheck={false}
+          style={{ 
+            backgroundColor: 'transparent', 
+            border: 'none', 
+            color: '#fff', 
+            fontFamily: 'inherit',
+            fontSize: '1rem', 
+            width: '100%', 
+            outline: 'none' 
+          }} 
+        />
       </div>
+      <div ref={bottomRef} />
     </div>
   );
 }
