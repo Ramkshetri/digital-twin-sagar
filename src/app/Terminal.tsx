@@ -65,6 +65,7 @@ export default function Terminal() {
   cat [file]    Read file content
   status        Check system integrity
   threat-intel  View active blocked attacks (SOC Mode)
+  attack [type] Simulate cyber attack to test WAF (e.g., attack sqli)
   trace         Run network trace simulation
   encrypt [txt] Encrypt string (Base64)
   decrypt [txt] Decrypt string
@@ -154,6 +155,49 @@ Live:    digital-twin-sagar.vercel.app
       });
       
       return;
+    }
+    // --- COMMAND: ATTACK (SIMULATE WAF TRIGGER) ---
+    else if (command === 'attack') {
+      if (!target) {
+        response = "usage: attack [sqli | xss | ddos]";
+        type = 'error';
+      } else {
+        // 1. Clear input and log the initial attempt
+        setLogs(newLogs);
+        setInput('');
+        
+        setLogs(prev => [...prev, { type: 'system', content: `[WAF_TEST] Transmitting malicious payload: ${target.toUpperCase()}...` }]);
+
+        // 2. Hit your Next.js API route to trigger the backend WAF and Resend Email
+        fetch('/api/alert', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            attackType: target.toUpperCase(), 
+            payload: `Simulated ${target.toUpperCase()} payload from Terminal UI` 
+          })
+        })
+        .then(async (res) => {
+          if (res.status === 403) {
+            // WAF successfully blocked it
+            const data = await res.json();
+            setLogs(prev => [...prev, { type: 'error', content: `[CONNECTION DROPPED] ${data.message}` }]);
+            
+            // Add a slight delay for dramatic effect before showing the email alert confirmation
+            setTimeout(() => {
+              setLogs(prev => [...prev, { type: 'success', content: "🚨 ALERT DISPATCHED: SOC Admin notified via secure SMTP." }]);
+            }, 600);
+            
+          } else {
+            setLogs(prev => [...prev, { type: 'error', content: "ERROR: WAF failed to respond correctly." }]);
+          }
+        })
+        .catch(() => {
+          setLogs(prev => [...prev, { type: 'error', content: "FATAL: Connection to Edge WAF severed." }]);
+        });
+        
+        return; // Early return because the fetch handles the log updates asynchronously
+      }
     }
 
     // --- COMMAND: LS ---
